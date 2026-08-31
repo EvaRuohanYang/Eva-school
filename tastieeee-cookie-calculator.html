@@ -1,0 +1,486 @@
+<div id="app">
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f7f4ee;
+      color: #1f2933;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(246, 177, 122, 0.28), transparent 34rem),
+        linear-gradient(135deg, #f7f4ee 0%, #edf7f6 54%, #fdf6e3 100%);
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      align-items: center;
+      gap: 24px;
+      padding: 18px 0 24px;
+      border-bottom: 2px solid rgba(31, 41, 51, 0.08);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.4rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+      color: #63372c;
+    }
+
+    .tagline {
+      max-width: 620px;
+      margin: 14px 0 0;
+      color: #52616f;
+      font-size: 1.05rem;
+      line-height: 1.55;
+    }
+
+    .cookie-art {
+      aspect-ratio: 1;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    .cookie {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 62% 35%, #5b3329 0 7px, transparent 8px),
+        radial-gradient(circle at 38% 30%, #5b3329 0 8px, transparent 9px),
+        radial-gradient(circle at 46% 62%, #5b3329 0 9px, transparent 10px),
+        radial-gradient(circle at 69% 67%, #5b3329 0 7px, transparent 8px),
+        radial-gradient(circle at 28% 55%, #5b3329 0 6px, transparent 7px),
+        #d99b56;
+      border: 8px solid #bb7a3c;
+      box-shadow: 0 24px 50px rgba(99, 55, 44, 0.2);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
+      gap: 22px;
+      margin-top: 24px;
+    }
+
+    section {
+      min-width: 0;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(31, 41, 51, 0.1);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 18px 42px rgba(31, 41, 51, 0.08);
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      color: #23395b;
+      font-size: 1.25rem;
+      letter-spacing: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #394b59;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid #b8c2cc;
+      border-radius: 6px;
+      padding: 11px 12px;
+      font: inherit;
+      color: #1f2933;
+      background: #ffffff;
+    }
+
+    input:focus,
+    select:focus {
+      outline: 3px solid rgba(31, 122, 140, 0.25);
+      border-color: #1f7a8c;
+    }
+
+    .size-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .size-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .size-option span {
+      min-height: 72px;
+      display: grid;
+      align-content: center;
+      gap: 5px;
+      border: 1px solid #b8c2cc;
+      border-radius: 8px;
+      padding: 10px;
+      background: #ffffff;
+      color: #394b59;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .size-option strong {
+      color: #63372c;
+      font-size: 0.98rem;
+    }
+
+    .size-option input:checked + span {
+      border-color: #1f7a8c;
+      background: #eaf7f7;
+      box-shadow: inset 0 0 0 2px #1f7a8c;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 11px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      background: #1f7a8c;
+      color: #ffffff;
+    }
+
+    button.secondary {
+      background: #e8ecef;
+      color: #23395b;
+    }
+
+    button.suggest {
+      background: #c1666b;
+    }
+
+    .results {
+      display: grid;
+      gap: 14px;
+    }
+
+    .result-card {
+      border: 1px solid rgba(31, 41, 51, 0.1);
+      border-radius: 8px;
+      padding: 14px;
+      background: #ffffff;
+    }
+
+    .result-card h3 {
+      margin: 0 0 10px;
+      color: #63372c;
+      font-size: 1rem;
+      letter-spacing: 0;
+    }
+
+    .big-number {
+      font-size: clamp(2.1rem, 8vw, 4rem);
+      line-height: 1;
+      font-weight: 800;
+      color: #1f7a8c;
+      margin: 4px 0 10px;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .fact {
+      min-height: 76px;
+      border-radius: 8px;
+      background: #f5f7fa;
+      padding: 10px;
+      display: grid;
+      align-content: center;
+      gap: 4px;
+    }
+
+    .fact span {
+      color: #52616f;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .fact strong {
+      color: #1f2933;
+      font-size: 1.12rem;
+      word-break: break-word;
+    }
+
+    .message {
+      margin: 0;
+      color: #52616f;
+      line-height: 1.5;
+    }
+
+    .warning {
+      color: #8a4b12;
+      background: #fff5dd;
+      border-color: #f0c36a;
+    }
+
+    .formula {
+      margin-top: 14px;
+      border-left: 4px solid #c1666b;
+      padding: 10px 12px;
+      background: #fff7f4;
+      color: #52616f;
+      line-height: 1.45;
+      border-radius: 0 8px 8px 0;
+    }
+
+    @media (max-width: 760px) {
+      header,
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .cookie-art {
+        display: none;
+      }
+
+      .grid,
+      .facts,
+      .size-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <div class="shell">
+    <header>
+      <div>
+        <h1>TasTieeee</h1>
+        <p class="tagline">A cookie helper for beginners. Enter the ingredients you have, choose a cookie size, and see what recipe ratio you need or how many cookies you can bake.</p>
+      </div>
+      <div class="cookie-art" aria-hidden="true">
+        <div class="cookie"></div>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel" aria-labelledby="input-title">
+        <h2 id="input-title">Cookie Inputs</h2>
+        <div class="grid">
+          <label>
+            Flour in grams
+            <input id="flour" type="number" min="0" step="1" value="150">
+          </label>
+          <label>
+            Butter in grams
+            <input id="butter" type="number" min="0" step="1" value="100">
+          </label>
+          <label>
+            Sugar in grams
+            <input id="sugar" type="number" min="0" step="1" value="50">
+          </label>
+          <label>
+            Cookies wanted
+            <input id="wanted" type="number" min="1" step="1" value="30">
+          </label>
+        </div>
+
+        <div class="size-row" aria-label="Cookie size">
+          <label class="size-option">
+            <input type="radio" name="size" value="small" checked>
+            <span><strong>Small</strong>5 cm wide</span>
+          </label>
+          <label class="size-option">
+            <input type="radio" name="size" value="medium">
+            <span><strong>Medium</strong>7 cm wide</span>
+          </label>
+          <label class="size-option">
+            <input type="radio" name="size" value="large">
+            <span><strong>Large</strong>10 cm wide</span>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="calculate" type="button">Calculate</button>
+          <button id="suggest" class="suggest" type="button">Suggest</button>
+          <button id="reset" class="secondary" type="button">Reset</button>
+        </div>
+
+        <div class="formula">
+          Ratio stored by the app: 3 parts flour, 2 parts butter, 1 part sugar. Cookie mass uses pi x radius squared x 0.5 cm thickness x 1.2 g/cm3 density.
+        </div>
+      </section>
+
+      <section class="results" aria-live="polite">
+        <div class="result-card">
+          <h3>Cookies possible with your ingredients</h3>
+          <div id="possibleCookies" class="big-number">12</div>
+          <p id="limitMessage" class="message">Your ingredients are balanced for this recipe.</p>
+        </div>
+
+        <div class="result-card">
+          <h3>Ingredients needed for your goal</h3>
+          <div class="facts">
+            <div class="fact"><span>Flour</span><strong id="needFlour">353 g</strong></div>
+            <div class="fact"><span>Butter</span><strong id="needButter">236 g</strong></div>
+            <div class="fact"><span>Sugar</span><strong id="needSugar">118 g</strong></div>
+          </div>
+        </div>
+
+        <div id="shoppingCard" class="result-card">
+          <h3>Missing ingredients</h3>
+          <div class="facts">
+            <div class="fact"><span>Flour</span><strong id="missingFlour">203 g</strong></div>
+            <div class="fact"><span>Butter</span><strong id="missingButter">136 g</strong></div>
+            <div class="fact"><span>Sugar</span><strong id="missingSugar">68 g</strong></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const sizes = {
+      small: { radius: 2.5, label: "small" },
+      medium: { radius: 3.5, label: "medium" },
+      large: { radius: 5, label: "large" }
+    };
+
+    const flourInput = document.getElementById("flour");
+    const butterInput = document.getElementById("butter");
+    const sugarInput = document.getElementById("sugar");
+    const wantedInput = document.getElementById("wanted");
+    const calculateButton = document.getElementById("calculate");
+    const suggestButton = document.getElementById("suggest");
+    const resetButton = document.getElementById("reset");
+
+    function grams(value) {
+      return Math.max(0, Number(value) || 0);
+    }
+
+    function roundGram(value) {
+      return `${Math.ceil(Math.max(0, value))} g`;
+    }
+
+    function selectedSize() {
+      return document.querySelector('input[name="size"]:checked').value;
+    }
+
+    function massPerCookie(sizeName) {
+      const radius = sizes[sizeName].radius;
+      const thickness = 0.5;
+      const density = 1.2;
+      return Math.PI * radius * radius * thickness * density;
+    }
+
+    function calculate() {
+      const flour = grams(flourInput.value);
+      const butter = grams(butterInput.value);
+      const sugar = grams(sugarInput.value);
+      const wanted = Math.max(1, Math.floor(Number(wantedInput.value) || 1));
+      const sizeName = selectedSize();
+      const cookieMass = massPerCookie(sizeName);
+
+      const neededDough = wanted * cookieMass;
+      const neededFlour = neededDough * (3 / 6);
+      const neededButter = neededDough * (2 / 6);
+      const neededSugar = neededDough * (1 / 6);
+
+      const recipeUnits = Math.min(flour / 3, butter / 2, sugar / 1);
+      const usableDough = Math.max(0, recipeUnits * 6);
+      const possibleCookies = Math.floor(usableDough / cookieMass);
+
+      const limiting = [];
+      if (flour / 3 === recipeUnits) limiting.push("flour");
+      if (butter / 2 === recipeUnits) limiting.push("butter");
+      if (sugar === recipeUnits) limiting.push("sugar");
+
+      document.getElementById("possibleCookies").textContent = possibleCookies;
+      document.getElementById("needFlour").textContent = roundGram(neededFlour);
+      document.getElementById("needButter").textContent = roundGram(neededButter);
+      document.getElementById("needSugar").textContent = roundGram(neededSugar);
+      document.getElementById("missingFlour").textContent = roundGram(neededFlour - flour);
+      document.getElementById("missingButter").textContent = roundGram(neededButter - butter);
+      document.getElementById("missingSugar").textContent = roundGram(neededSugar - sugar);
+
+      const limitMessage = document.getElementById("limitMessage");
+      if (possibleCookies >= wanted) {
+        limitMessage.textContent = `You have enough ingredients for ${wanted} ${sizes[sizeName].label} cookies.`;
+      } else if (flour === 0 || butter === 0 || sugar === 0) {
+        limitMessage.textContent = "Enter flour, butter, and sugar to see how many cookies your current ingredients can make.";
+      } else {
+        limitMessage.textContent = `You can make about ${possibleCookies} ${sizes[sizeName].label} cookies. The limiting ingredient is ${limiting.join(", ")}.`;
+      }
+    }
+
+    function resetForm() {
+      flourInput.value = 150;
+      butterInput.value = 100;
+      sugarInput.value = 50;
+      wantedInput.value = 30;
+      document.querySelector('input[name="size"][value="small"]').checked = true;
+      calculate();
+    }
+
+    function suggestCookies() {
+      const flour = grams(flourInput.value);
+      const butter = grams(butterInput.value);
+      const sugar = grams(sugarInput.value);
+      const sizeName = selectedSize();
+      const cookieMass = massPerCookie(sizeName);
+      const recipeUnits = Math.min(flour / 3, butter / 2, sugar / 1);
+      const possibleCookies = Math.floor(Math.max(0, recipeUnits * 6) / cookieMass);
+
+      wantedInput.value = possibleCookies > 0 ? possibleCookies : 24;
+      calculate();
+    }
+
+    calculateButton.addEventListener("click", calculate);
+    suggestButton.addEventListener("click", suggestCookies);
+    resetButton.addEventListener("click", resetForm);
+    document.querySelectorAll("input").forEach((input) => {
+      input.addEventListener("input", calculate);
+      input.addEventListener("change", calculate);
+    });
+
+    calculate();
+  </script>
+</div>
