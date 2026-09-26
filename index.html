@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Safety Assistant App Demo</title>
+  <style>
+    :root {
+      --bg: #eef2f1;
+      --ink: #152026;
+      --muted: #64727a;
+      --panel: #ffffff;
+      --line: #d7dfdc;
+      --green: #237a57;
+      --blue: #28628f;
+      --yellow: #e6b94c;
+      --red: #c9433d;
+      --dark: #111a20;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    .app {
+      width: min(430px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      background: var(--panel);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 32px rgba(17, 26, 32, 0.18);
+    }
+
+    .topbar {
+      padding: 18px 18px 14px;
+      background: var(--dark);
+      color: #ffffff;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 23px;
+      letter-spacing: 0;
+    }
+
+    .topbar p {
+      margin: 4px 0 0;
+      color: #b9c4c9;
+      font-size: 14px;
+    }
+
+    .camera {
+      position: relative;
+      height: 330px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, #aad2e8 0 32%, #dcead4 32% 100%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .wide-lens {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      top: 18px;
+      height: 112px;
+      border: 3px solid rgba(255, 255, 255, 0.92);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 700;
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .road {
+      position: absolute;
+      left: 50%;
+      bottom: -32px;
+      width: 250px;
+      height: 270px;
+      transform: translateX(-50%) perspective(420px) rotateX(58deg);
+      clip-path: polygon(37% 0, 63% 0, 100% 100%, 0 100%);
+      background: #626e74;
+    }
+
+    .road::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 30px;
+      width: 8px;
+      height: 180px;
+      transform: translateX(-50%);
+      background: repeating-linear-gradient(
+        to bottom,
+        #ffffff 0 22px,
+        transparent 22px 42px
+      );
+    }
+
+    .person {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      width: 42px;
+      height: 42px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: var(--green);
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      border: 3px solid #ffffff;
+    }
+
+    .detected {
+      position: absolute;
+      min-width: 84px;
+      padding: 8px 9px;
+      border: 3px solid;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.86);
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .scanning .detected {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .car {
+      right: 24px;
+      top: 145px;
+      border-color: var(--red);
+    }
+
+    .obstacle {
+      left: 22px;
+      top: 225px;
+      border-color: var(--yellow);
+    }
+
+    .traffic {
+      right: 35px;
+      top: 54px;
+      border-color: var(--blue);
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -4px;
+      height: 4px;
+      background: #ffffff;
+      opacity: 0;
+      box-shadow: 0 0 16px #ffffff;
+    }
+
+    .scanning .scan-line {
+      opacity: 1;
+      animation: scan 2s linear infinite;
+    }
+
+    @keyframes scan {
+      from {
+        top: 0;
+      }
+      to {
+        top: 330px;
+      }
+    }
+
+    .status {
+      padding: 15px 18px;
+      background: #f8faf9;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .status-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .status-text {
+      min-height: 30px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .controls {
+      padding: 16px 18px 20px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    button {
+      min-height: 54px;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      background: var(--dark);
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .primary {
+      background: var(--green);
+    }
+
+    .voice {
+      background: var(--blue);
+    }
+
+    .obstacle-btn {
+      width: 100%;
+      background: var(--yellow);
+      color: #1d2529;
+    }
+
+    .red-btn {
+      width: 100%;
+      background: var(--blue);
+    }
+
+    .danger-btn {
+      width: 100%;
+      background: var(--red);
+    }
+
+    .switch-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfb;
+    }
+
+    .switch-panel strong {
+      display: block;
+      font-size: 15px;
+    }
+
+    .switch-panel span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toggle {
+      width: 58px;
+      height: 32px;
+      min-height: 32px;
+      border-radius: 99px;
+      background: #a8b4b8;
+      padding: 4px;
+      flex: 0 0 auto;
+      border: 0;
+    }
+
+    .toggle::before {
+      content: "";
+      display: block;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: transform 0.2s ease;
+    }
+
+    .toggle.on {
+      background: var(--green);
+    }
+
+    .toggle.on::before {
+      transform: translateX(26px);
+    }
+
+    .mini-title {
+      margin: 4px 0 -4px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .vibration-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfb;
+    }
+
+    .pattern {
+      height: 18px;
+      margin-top: 8px;
+      border-radius: 99px;
+      border: 1px solid rgba(35, 122, 87, 0.35);
+      background: repeating-linear-gradient(
+        90deg,
+        var(--green) 0 15px,
+        transparent 15px 24px
+      );
+    }
+
+    .pattern.long {
+      background: var(--blue);
+      border-color: rgba(40, 98, 143, 0.35);
+    }
+
+    .pattern.rapid {
+      background: repeating-linear-gradient(
+        90deg,
+        var(--red) 0 8px,
+        transparent 8px 13px
+      );
+      border-color: rgba(201, 67, 61, 0.35);
+    }
+
+    .log {
+      min-height: 88px;
+      max-height: 115px;
+      overflow: auto;
+      padding: 10px;
+      border-radius: 8px;
+      background: #111a20;
+      color: #d8e1e5;
+      font-size: 13px;
+    }
+
+    .log div + div {
+      margin-top: 5px;
+    }
+
+    .flash {
+      animation: flash 0.35s ease 3;
+    }
+
+    @keyframes flash {
+      50% {
+        background: #fff1f1;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .app {
+        width: 100%;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <h1>Safety Assistant</h1>
+      <p>AI camera, voice guidance, and vibration alerts</p>
+    </header>
+
+    <section class="camera" id="cameraView" aria-label="Camera detection area">
+      <div class="scan-line"></div>
+      <div class="wide-lens">Wide-angle camera</div>
+      <div class="road"></div>
+      <div class="detected traffic">Red light</div>
+      <div class="detected car">Car nearby</div>
+      <div class="detected obstacle">Obstacle</div>
+      <div class="person">You</div>
+    </section>
+
+    <section class="status" id="statusPanel">
+      <div class="status-label">Current instruction</div>
+      <div class="status-text" id="statusText">Ready. Tap Start AI Scan.</div>
+    </section>
+
+    <section class="controls">
+      <div class="row">
+        <button class="primary" id="scanBtn" type="button">Start AI Scan</button>
+        <button class="voice" id="voiceBtn" type="button">Speak Warning</button>
+      </div>
+
+      <div class="switch-panel">
+        <div>
+          <strong>Blind + Deaf Mode</strong>
+          <span>Uses vibration instead of voice.</span>
+        </div>
+        <button class="toggle" id="modeToggle" type="button" aria-label="Toggle blind and deaf mode"></button>
+      </div>
+
+      <div class="mini-title">Vibration demo buttons</div>
+
+      <div class="vibration-card">
+        <button class="obstacle-btn" id="obstacleBtn" type="button">Obstacle Ahead</button>
+        <div class="pattern"></div>
+      </div>
+
+      <div class="vibration-card">
+        <button class="red-btn" id="redLightBtn" type="button">Red Traffic Light</button>
+        <div class="pattern long"></div>
+      </div>
+
+      <div class="vibration-card">
+        <button class="danger-btn" id="dangerBtn" type="button">Very Dangerous Situation</button>
+        <div class="pattern rapid"></div>
+      </div>
+
+      <div class="mini-title">App activity</div>
+      <div class="log" id="log">
+        <div>App opened.</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const cameraView = document.getElementById("cameraView");
+    const statusPanel = document.getElementById("statusPanel");
+    const statusText = document.getElementById("statusText");
+    const log = document.getElementById("log");
+    const scanBtn = document.getElementById("scanBtn");
+    const voiceBtn = document.getElementById("voiceBtn");
+    const modeToggle = document.getElementById("modeToggle");
+    const obstacleBtn = document.getElementById("obstacleBtn");
+    const redLightBtn = document.getElementById("redLightBtn");
+    const dangerBtn = document.getElementById("dangerBtn");
+
+    let scanning = false;
+    let deafBlindMode = false;
+
+    function addLog(message) {
+      const line = document.createElement("div");
+      line.textContent = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      }) + " - " + message;
+      log.prepend(line);
+    }
+
+    function setStatus(message) {
+      statusText.textContent = message;
+      statusPanel.classList.remove("flash");
+      void statusPanel.offsetWidth;
+      statusPanel.classList.add("flash");
+      addLog(message);
+    }
+
+    function vibrate(pattern, message) {
+      if ("vibrate" in navigator) {
+        navigator.vibrate(pattern);
+      } else {
+        addLog("Vibration is not supported in this browser. Use this as a visual demo.");
+      }
+      setStatus(message);
+    }
+
+    function speak(message) {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        addLog("Voice output is not supported in this browser.");
+      }
+      setStatus(message);
+    }
+
+    scanBtn.addEventListener("click", () => {
+      scanning = !scanning;
+      cameraView.classList.toggle("scanning", scanning);
+      scanBtn.textContent = scanning ? "Stop AI Scan" : "Start AI Scan";
+      if (scanning) {
+        setStatus("AI scan started. Car, obstacle, and red light detected.");
+      } else {
+        setStatus("AI scan stopped.");
+      }
+    });
+
+    voiceBtn.addEventListener("click", () => {
+      if (deafBlindMode) {
+        vibrate([120, 80, 120, 80, 120], "Deaf-blind mode: short vibrations warn about an obstacle.");
+      } else {
+        speak("Warning. Obstacle ahead. Please slow down.");
+      }
+    });
+
+    modeToggle.addEventListener("click", () => {
+      deafBlindMode = !deafBlindMode;
+      modeToggle.classList.toggle("on", deafBlindMode);
+      setStatus(deafBlindMode ? "Blind and deaf mode is on. Warnings use vibration." : "Voice mode is on.");
+    });
+
+    obstacleBtn.addEventListener("click", () => {
+      vibrate([120, 80, 120, 80, 120, 80, 120], "Short repeated vibrations: obstacle ahead.");
+    });
+
+    redLightBtn.addEventListener("click", () => {
+      vibrate([900], "One long vibration: red traffic light. Stop.");
+    });
+
+    dangerBtn.addEventListener("click", () => {
+      vibrate([80, 40, 80, 40, 80, 40, 80, 40, 80, 40, 80, 40, 80], "Rapid continuous vibrations: very dangerous situation.");
+    });
+  </script>
+</body>
+</html>
